@@ -1,0 +1,40 @@
+version: "3"
+services:
+    api:
+        build: ./api
+        ports: 
+            - "3080:3080"
+        volumes:
+            - ./api/src:/app/src:ro
+            - ./api/logs:/app/logs
+            - ./api/docs/jsdoc:/app/docs/jsdoc
+            - /api/node_modules
+        depends_on:
+            db:
+                condition: service_healthy
+        networks: 
+            - 3rdg
+        hostname: backend
+
+    db:
+        image: mysql
+        ports:
+            - "3200:3306"
+        volumes:
+            - ./database/mysql:/var/lib/mysql
+            - ./database/files/init:/docker-entrypoint-initdb.d
+        environment:
+            - MYSQL_ROOT_PASSWORD=root_password
+            - LANG=C.UTF-8
+        networks: 
+            - 3rdg
+        hostname: database
+        healthcheck: 
+            test: bash -c "[ -d /var/lib/mysql/gigsapi ]"
+            interval: 3s
+            timeout: 30s
+            retries: 10
+
+networks:
+    3rdg:
+        name: 3rdg
