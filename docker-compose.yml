@@ -13,8 +13,27 @@ services:
             db:
                 condition: service_healthy
         networks: 
-            - 3rdg
+            - 3rdg-front
+            - 3rdg-back
         hostname: backend
+
+    front:
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./front/src:/app/front/src:ro
+            - /app/front/node_modules
+            - ./.git:/app/.git
+        depends_on: 
+            - api
+        networks:
+            - 3rdg-front
+        hostname: frontend
+        tty: true
+        stdin_open: false
 
     db:
         image: mysql
@@ -27,7 +46,7 @@ services:
             - MYSQL_ROOT_PASSWORD=root_password
             - LANG=C.UTF-8
         networks: 
-            - 3rdg
+            - 3rdg-back
         hostname: database
         healthcheck: 
             test: bash -c "[ -d /var/lib/mysql/gigsapi ]"
@@ -36,5 +55,7 @@ services:
             retries: 10
 
 networks:
-    3rdg:
-        name: 3rdg
+    3rdg-front:
+        name: 3rdg-front
+    3rdg-back:
+        name: 3rdg-back

@@ -1,3 +1,7 @@
-.vscode
-.DS_Store
-.DS_Store/
+*.code-workspace
+**/.vscode
+**/.DS_Store
+**/.DS_Store/
+**/node_modules
+**/coverage
+**/.env
